@@ -32,9 +32,10 @@ var privateKey = process.env.PRIVATE_KEY;
 
 if (!privateKey) {
   try {
-    privateKey = fs.readFileSync('..\..\keys\key.pem').toString();
+    privateKey = fs.readFileSync('..\\..\\keys\\key.pem').toString();
   } catch(e) {
-    console.error('Couldn\'t find Private Key file: layer-key.pem');
+    console.error('Couldn\'t find Private Key file: key.pem');
+    console.log(e);
   }
 }
 
