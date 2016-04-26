@@ -4,7 +4,7 @@ node_js:
 before_install: 
 - cd $APP_DIR
 install:
-- pm install
+- npm install
 script:
 # test amd coverage
 - npm run travis-test
