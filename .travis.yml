@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+- '4.2'
+before_install: 
+- cd $APP_DIR
+install:
+- npm install
+script:
+# test amd coverage
+- npm run travis-test
+- npm run travis-coverage
+env:
+  - APP_DIR=linkme-chatapp

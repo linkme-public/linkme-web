@@ -1,4 +1,6 @@
 # linkme-public
+[![Build Status](https://travis-ci.org/linkme-public/linkme-web?branch=master)](https://travis-ci.org/linkme-public/linkme-web)
+[![Coverage Status](https://travis-ci.org/linkme-public/linkme-web/coverage.svg?precision=2)](https://travis-ci.org/linkme-public/linkme-web)
 
 ## Repo structure
 
