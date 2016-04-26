@@ -18,7 +18,7 @@ describe("server tests", function () {
 
     it("should warm up server", function (done) {
 
-        this.timeout(10000);
+        this.timeout(20000);
 
         request(server)
             .get("/")
