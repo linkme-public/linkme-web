@@ -1,4 +1,6 @@
 # linkme-public
+[![Build Status](https://github.com/linkme-public/linkme-web?branch=master)](https://github.com/linkme-public/linkme-web)
+[![Coverage Status](https://github.com/linkme-public/linkme-web/coverage.svg?precision=2)](https://github.com/linkme-public/linkme-web)
 
 ## Repo structure
 

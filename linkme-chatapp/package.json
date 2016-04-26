@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node devServer.js",
     "build": "webpack --config webpack.config.js",
-    "test": "mocha" 
+    "test": "mocha",
+    "travis-test": "istanbul cover ./node_modules/mocha/bin/_mocha test/*.js -- -R spec",
+    "travis-coverage": "./node_modules/.bin/codecov"
   },
   "dependencies": {
     "async": "^1.5.2",
@@ -25,8 +27,10 @@
     "babel-core": "^5.6.18",
     "babel-loader": "^5.1.4",
     "babel-plugin-react-transform": "^1.0.3",
+    "codecov": "^1.0.1",
     "css-loader": "^0.19.0",
     "express": "^4.13.3",
+    "istanbul": "^0.4.3",
     "mocha": "^2.4.5",
     "react-transform-hmr": "^1.0.0",
     "should": "^8.3.1",
