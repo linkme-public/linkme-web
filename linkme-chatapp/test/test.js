@@ -1,5 +1,6 @@
 var should = require("should");
 var request = require("supertest");
+var async = require("async");
 
 var server = require("./../devServer");
 
@@ -8,20 +9,27 @@ var server = require("./../devServer");
  */
 describe("server tests", function () {
 
+
     it("should exist", function (done) {
 
         should.exist(server);
         done();
     });
 
+    it("should warm up server", function (done) {
+
+        this.timeout(10000);
+
+        request(server)
+            .get("/")
+            .expect(200, done);
+    });
 });
 
 /**
  * Test suite for api
  */
 describe("api tests", function () {
-
-    this.timeout(10000);
 
     it("should have /api", function (done) {
 
@@ -30,4 +38,37 @@ describe("api tests", function () {
             .expect(200, done);
     });
 
+    it("should not allow posting to /api/link without link", function (done) {
+
+        request(server)
+            .post("/api/link")
+            .expect(400, done);
+    });
+
+    it("should not allow posting to /api/link with invalid link", function (done) {
+
+        request(server)
+            .post("/api/link")
+            .field("link", "invalidlink")
+            .expect(400, done);
+    });
+
+    it("should allow posting to /api/link with a valid link", function (done) {
+
+        function testLink(link) {
+            return function (done) {
+                request(server)
+                    .post("/api/link")
+                    .send({ link: link })
+                    .expect(200, done);
+            };
+        }
+
+        async.parallel([
+            testLink("http://google.com"),
+            testLink("https://google.com"),
+            testLink("http://www.google.com"),
+            testLink("https://www.google.com")
+        ], done);
+    });
 });
