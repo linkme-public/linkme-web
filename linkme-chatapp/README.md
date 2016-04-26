@@ -24,3 +24,22 @@ Understanding this application requires understanding two things:
 2. [layer-react](./layer-react) module
 
 The layer-react module provides a LayerProvider for wrapping UI Components; it takes as input a Client, and passes to its children the output of Conversation and Message queries.
+
+## API
+
+### How to ping the api
+
+`GET /api`
+
+
+### How to post a link
+
+`POST /api/link`
+
+with body 
+
+```json
+{
+    "link": "blaaaah"
+} 
+```  

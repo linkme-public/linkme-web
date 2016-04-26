@@ -4,7 +4,8 @@
   "description": "React chat UI example using Layer SDK",
   "scripts": {
     "start": "node devServer.js",
-    "build": "webpack --config webpack.config.js"
+    "build": "webpack --config webpack.config.js",
+    "test": "mocha" 
   },
   "dependencies": {
     "async": "^1.5.2",

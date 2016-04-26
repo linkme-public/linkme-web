@@ -21,7 +21,9 @@ router.post('/link', function (request, response) {
     if (link === null || link === undefined) {
         response
             .status(400)
-            .send("Link is null or undefined.");
+            .send({
+                message: "Link is null or undefined."
+            });
 
         return;
     }
@@ -29,7 +31,9 @@ router.post('/link', function (request, response) {
     if (!validUrl.isUri(link)) {
         response
             .status(400)
-            .send("You think you can fool me with an invalid URL?");
+            .send({
+                message: "You think you can fool me with an invalid URL?"
+            });
 
         return;
     }
