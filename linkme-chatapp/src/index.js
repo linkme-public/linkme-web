@@ -24,7 +24,7 @@ window.addEventListener('message', function(evt) {
    * Initialize Layer Client with `appId`
    */
   const client = new Client({
-    appId: "layer:///apps/staging/82f131ea-0316-11e6-935b-c161010024fd"
+    appId: evt.data.layerAppId
   });
 
   /**

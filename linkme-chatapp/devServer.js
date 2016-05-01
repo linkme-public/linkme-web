@@ -52,6 +52,10 @@ function createApp() {
   app.get('/facebook/app', function (req, res) {
     res.json(process.env.FACEBOOK_APPID);
   });
+  
+  app.get('/layer/app', function (req, res) {
+    res.json(process.env.LAYER_APPID);
+  });
 
   app.post('/authenticate', function (req, res) {
     // TODO: verify if Facebook token is valid for that user -> Otherwise anyone with a facebook user id, can send messages on his/her behalf, by seding us a valid nonce
