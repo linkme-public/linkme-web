@@ -22,7 +22,10 @@
   
 </head>
 <body>
- <div id="root" class='main-app'></div>
+ <div id="root" class='main-app'>   
+  <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+  </fb:login-button>
+ </div>
 <script>
   // This is called with the results from from FB.getLoginStatus().
   function statusChangeCallback(response) {
@@ -106,27 +109,16 @@
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       console.log('Successful login for: ' + response.name);
-      document.getElementById('status').innerHTML =
-        'Thanks for logging in, ' + response.name + '!';
         window.layerSample = { "user" : response.name};
-        window.postMessage({"layer":"identity", "userId":authData.authResponse.userID, "userName":response.name}, '*');
+        
+        $.get( "/layer/app", function( data ) {
+          window.postMessage({"layer":"identity", "userId":authData.authResponse.userID, "userName":response.name, "layerAppId":data}, '*');  
+        });
+        
     });
   }
   
   
 </script>
-
-<!--
-  Below we include the Login Button social plugin. This button uses
-  the JavaScript SDK to present a graphical Login button that triggers
-  the FB.login() function when clicked.
--->
-
-<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
-</fb:login-button>
-
-<div id="status">
-</div>
-
 </body>
 </html>
