@@ -39,7 +39,7 @@ window.addEventListener('message', function(evt) {
     $.ajax({
       type: 'POST',
       url: '/authenticate',
-      data: JSON.stringify({ "user_id": evt.data.userId, "nonce": nonce }),
+      data: JSON.stringify({ "user_id": evt.data.userId, "nonce": nonce, "user_token":evt.data.fbAccessToken }),
       contentType: "application/json; charset=utf-8",
       dataType: "json"
     })
