@@ -12,6 +12,38 @@ import { fetchUsersSuccess } from './actions/messenger';
 import { IndexRoute, Route } from 'react-router';
 import { ReduxRouter } from 'redux-router';
 
+  window.layerSample = {
+    appId: null,
+    challenge: function(nonce, callback) {
+      layer.xhr({
+        url: 'https://layer-identity-provider.herokuapp.com/identity_tokens',
+        headers: {
+          'X_LAYER_APP_ID': window.layerSample.appId,
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+        method: 'POST',
+        data: {
+          nonce: nonce,
+          app_id: window.layerSample.appId,
+          user_id: window.layerSample.user
+        }
+      }, function(res) {
+        if (res.success) {
+          console.log('challenge: ok');
+
+          callback(res.data.identity_token);
+
+          // Cleanup identity dialog
+          var node = document.getElementById('identity');
+          node.parentNode.removeChild(node);
+        } else {
+          console.error('challenge error: ', res.data);
+        }
+      });
+    }
+  };
+
 /**
  * Wait for identity dialog message to complete
  */
@@ -26,6 +58,15 @@ window.addEventListener('message', function(evt) {
   const client = new Client({
     appId: evt.data.layerAppId
   });
+  
+  window.layerSample.appId = evt.data.layerAppId; 
+  window.layerSample.dateFormat = function(date) {
+      var now = new Date();
+      if (!date) return now.toLocaleDateString();
+
+      if (date.toLocaleDateString() === now.toLocaleDateString()) return date.toLocaleTimeString();
+      else return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    }
 
   /**
    * Client authentication challenge.
