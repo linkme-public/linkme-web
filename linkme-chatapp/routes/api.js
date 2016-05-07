@@ -1,5 +1,17 @@
 var router = require("express").Router();
 var validUrl = require('valid-url');
+var layer = require('layer-api');
+
+var layerProviderID = process.env.LAYER_PROVIDER_ID;
+var layerKeyID = process.env.LAYER_KEY_ID;
+var privateKey = process.env.PRIVATE_KEY;
+var layerAppId = process.env.LAYER_APPID;
+var layerAppTokenId = process.env.LAYER_APP_TOKEN;
+  
+var client = new layer({
+    appId: layerAppId,
+    token: layerAppTokenId
+});
 
 /**
  * Get a ping from the api
@@ -37,6 +49,23 @@ router.post('/link', function (request, response) {
 
         return;
     }
+
+    // Create a Conversation 
+    client.conversations.create({
+            participants: [
+            "1173665432652489", //vando
+            "1726034921014500", //reza
+            "1176465935705725" //olly
+        ],
+        distinct: true
+    }, function(err, res) {
+        var cid = res.body.id;
+        
+        // Send a Message 
+        client.messages.sendTextFromUser(cid, '1173665432652489', link, function(err, res) {
+            console.log(err || res.body);
+        });
+    });
 
     response
         .status(200)

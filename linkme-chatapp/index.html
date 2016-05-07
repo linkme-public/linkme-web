@@ -112,7 +112,7 @@
         window.layerSample = { "user" : response.name};
         
         $.get( "/layer/app", function( data ) {
-          window.postMessage({"layer":"identity", "userId":authData.authResponse.userID, "userName":response.name, "layerAppId":data}, '*');  
+          window.postMessage({"layer":"identity", "userId":authData.authResponse.userID, "userName":response.name, "layerAppId":data, "fbAccessToken":authData.authResponse.accessToken}, '*');  
         });
         
     });

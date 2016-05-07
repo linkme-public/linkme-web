@@ -9,6 +9,8 @@ var config = require('./webpack.config');
 var bodyParser = require('body-parser')
 var fs = require('fs')
 var jsrsasign = require('jsrsasign');
+var request = require('request');
+var async = require('async');
 
 var api = require('./routes/api')
 
@@ -39,6 +41,8 @@ function createApp() {
   var layerProviderID = process.env.LAYER_PROVIDER_ID;
   var layerKeyID = process.env.LAYER_KEY_ID;
   var privateKey = process.env.PRIVATE_KEY;
+  var facebookAppId = process.env.FACEBOOK_APPID;
+  var appToken = process.env.FACEBOOK_APPTOKEN;
 
   if (!privateKey) {
     try {
@@ -50,7 +54,7 @@ function createApp() {
   }
 
   app.get('/facebook/app', function (req, res) {
-    res.json(process.env.FACEBOOK_APPID);
+    res.json(facebookAppId);
   });
   
   app.get('/layer/app', function (req, res) {
@@ -68,35 +72,42 @@ function createApp() {
     if (!layerProviderID) return res.status(500).send('Couldn\'t find LAYER_PROVIDER_ID');
     if (!layerKeyID) return res.status(500).send('Couldn\'t find LAYER_KEY_ID');
     if (!privateKey) return res.status(500).send('Couldn\'t find Private Key');
+    
+    validateFacebookUserToken(req.body.user_id, req.body.user_token, function onValidate(successful) {
+      if(!successful) {
+        res.send(401, { error: 'Authentication failed' });
+        return;
+      }
+      
+      var header = JSON.stringify({
+        typ: 'JWT',           // Expresses a MIMEType of application/JWT
+        alg: 'RS256',         // Expresses the type of algorithm used to sign the token, must be RS256
+        cty: 'layer-eit;v=1', // Express a Content Type of application/layer-eit;v=1
+        kid: layerKeyID
+      });
 
-    var header = JSON.stringify({
-      typ: 'JWT',           // Expresses a MIMEType of application/JWT
-      alg: 'RS256',         // Expresses the type of algorithm used to sign the token, must be RS256
-      cty: 'layer-eit;v=1', // Express a Content Type of application/layer-eit;v=1
-      kid: layerKeyID
-    });
+      var currentTimeInSeconds = Math.round(new Date() / 1000);
+      var expirationTime = currentTimeInSeconds + 10000;
 
-    var currentTimeInSeconds = Math.round(new Date() / 1000);
-    var expirationTime = currentTimeInSeconds + 10000;
+      var claim = JSON.stringify({
+        iss: layerProviderID,       // The Layer Provider ID
+        prn: userId,                // User Identifier
+        iat: currentTimeInSeconds,  // Integer Time of Token Issuance 
+        exp: expirationTime,        // Integer Arbitrary time of Token Expiration
+        nce: nonce                  // Nonce obtained from the Layer Client SDK
+      });
 
-    var claim = JSON.stringify({
-      iss: layerProviderID,       // The Layer Provider ID
-      prn: userId,                // User Identifier
-      iat: currentTimeInSeconds,  // Integer Time of Token Issuance 
-      exp: expirationTime,        // Integer Arbitrary time of Token Expiration
-      nce: nonce                  // Nonce obtained from the Layer Client SDK
-    });
+      var jws = null;
+      try {
+        jws = jsrsasign.jws.JWS.sign('RS256', header, claim, privateKey);
+      } catch (e) {
+        return res.status(500).send('Could not create signature. Invalid Private Key: ' + e);
+      }
 
-    var jws = null;
-    try {
-      jws = jsrsasign.jws.JWS.sign('RS256', header, claim, privateKey);
-    } catch (e) {
-      return res.status(500).send('Could not create signature. Invalid Private Key: ' + e);
-    }
-
-    res.json({
-      identity_token: jws
-    });
+      res.json({
+        identity_token: jws
+      });  
+    });    
   });
 
   app.listen(port, function (error) {
@@ -125,6 +136,16 @@ function createApp() {
     }
 
     return false;
+  }
+  
+  function validateFacebookUserToken(userId, userToken, onResponse) {
+    request('https://graph.facebook.com/debug_token?input_token=' + userToken + '&access_token=' + appToken, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        var resJson = JSON.parse(response.body);
+        return onResponse(resJson.data.app_id == facebookAppId
+               && resJson.data.user_id == userId);
+      }
+    });
   }
 
   return app;
