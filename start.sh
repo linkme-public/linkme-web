@@ -1,12 +1,12 @@
 cd /tmp
 
 # try to remove the repo if it already exists
-rm -rf linkme-public; true
+rm -rf linkme-web; true
 
-git clone https://github.com/vandop/linkme-public.git
+git clone https://github.com/linkme-public/linkme-web.git
 
-cd linkme-public/linkme-chatapp
+cd linkme-web/linkme-chatapp
 
 npm install
 
-node .
+npm start
