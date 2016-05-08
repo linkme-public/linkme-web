@@ -57,7 +57,10 @@ router.post('/link', function (request, response) {
             "10153420634920946", //reza
             "1176465935705725" //olly
         ],
-        distinct: false
+        distinct: false,
+        metadata: {
+            "title": link
+        }
     }, function(err, res) {
         var cid = res.body.id;
         
