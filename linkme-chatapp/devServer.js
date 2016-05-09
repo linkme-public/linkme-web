@@ -12,7 +12,7 @@ var jsrsasign = require('jsrsasign');
 var request = require('request');
 var async = require('async');
 
-var api = require('./routes/api')
+var api = require('./routes/api');
 
 var app = createApp();
 
@@ -62,9 +62,14 @@ function createApp() {
   });
 
   app.post('/authenticate', function (req, res) {
+    
+    console.log("Started authenticating");
+    
     // TODO: verify if Facebook token is valid for that user -> Otherwise anyone with a facebook user id, can send messages on his/her behalf, by seding us a valid nonce
     var userId = req.body.user_id;
     var nonce = req.body.nonce;
+    console.log("userId = " + userId);
+    console.log("nonce = " + nonce);
 
     if (!userId) return res.status(400).send('Missing `user_id` body parameter.');
     if (!nonce) return res.status(400).send('Missing `nonce` body parameter.');
@@ -139,7 +144,12 @@ function createApp() {
   }
   
   function validateFacebookUserToken(userId, userToken, onResponse) {
-    request('https://graph.facebook.com/debug_token?input_token=' + userToken + '&access_token=' + appToken, function (error, response, body) {
+    request('https://graph.facebook.com/debug_token?input_token=' + userToken + '&access_token=' + userToken, function (error, response, body) {
+      if (error) {
+        console.log("Error authenticating with graph.facebook");
+        console.log(error);
+      }
+      console.log("Got back " + response.statusCode + " from graph.facebook");
       if (!error && response.statusCode == 200) {
         var resJson = JSON.parse(response.body);
         return onResponse(resJson.data.app_id == facebookAppId
