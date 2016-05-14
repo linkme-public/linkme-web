@@ -71,4 +71,16 @@ describe("api tests", function () {
             testLink("https://www.google.com")
         ], done);
     });
+    
+    it("should allow getting facebook app ID", function(done) {
+          request(server)
+            .get("/facebook/app")
+            .expect('"' + process.env.FACEBOOK_APPID + '"', done);
+    });
+    
+    it("should allow getting Layer app ID", function(done) {
+          request(server)
+            .get("/layer/app")
+            .expect('"' + process.env.LAYER_APPID + '"', done);
+    });
 });
