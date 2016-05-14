@@ -2,9 +2,6 @@ var router = require("express").Router();
 var validUrl = require('valid-url');
 var layer = require('layer-api');
 
-var layerProviderID = process.env.LAYER_PROVIDER_ID;
-var layerKeyID = process.env.LAYER_KEY_ID;
-var privateKey = process.env.PRIVATE_KEY;
 var layerAppId = process.env.LAYER_APPID;
 var layerAppTokenId = process.env.LAYER_APP_TOKEN;
   
