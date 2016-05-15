@@ -2,9 +2,9 @@ language: node_js
 node_js:
 - '4.2'
 before_install:
-- openssl aes-256-cbc -K $encrypted_3cee0794dd90_key -iv $encrypted_3cee0794dd90_iv
-  -in key.pem.enc -out ../../key.pem -d
 - cd $APP_DIR
+- openssl aes-256-cbc -K $encrypted_3cee0794dd90_key -iv $encrypted_3cee0794dd90_iv
+  -in key.pem.enc -out ../../keys/key.pem -d
 install:
 - npm install
 script:
