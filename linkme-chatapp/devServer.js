@@ -46,7 +46,7 @@ function createApp() {
 
   if (!privateKey) {
     try {
-      privateKey = fs.readFileSync('..\\key.pem').toString();
+      privateKey = fs.readFileSync('key.pem').toString();
     } catch (e) {
       console.error('Couldn\'t find Private Key file: key.pem');
       console.log(e);
