@@ -31,3 +31,6 @@ build/Release
 
 # Optional REPL history
 .node_repl_history
+
+#vscode jsconfig
+jsconfig.json
