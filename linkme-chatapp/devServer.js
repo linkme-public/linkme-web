@@ -42,7 +42,7 @@ function createApp() {
   var layerKeyID = process.env.LAYER_KEY_ID;
   var privateKey = process.env.PRIVATE_KEY;
   var facebookAppId = process.env.FACEBOOK_APPID;
-  var appToken = process.env.FACEBOOK_APPTOKEN;
+  var appToken = facebookAppId + "|" + process.env.FACEBOOK_APPSECRET;
 
   if (!privateKey) {
     try {
@@ -68,11 +68,14 @@ function createApp() {
     // TODO: verify if Facebook token is valid for that user -> Otherwise anyone with a facebook user id, can send messages on his/her behalf, by seding us a valid nonce
     var userId = req.body.user_id;
     var nonce = req.body.nonce;
+    var userToken = req.body.user_token;
+    
     console.log("userId = " + userId);
     console.log("nonce = " + nonce);
 
     if (!userId) return res.status(400).send('Missing `user_id` body parameter.');
     if (!nonce) return res.status(400).send('Missing `nonce` body parameter.');
+    if (!userToken) return res.status(400).send('Missing `user_token` body parameter.');
 
     if (!layerProviderID) return res.status(500).send('Couldn\'t find LAYER_PROVIDER_ID');
     if (!layerKeyID) return res.status(500).send('Couldn\'t find LAYER_KEY_ID');
@@ -144,7 +147,7 @@ function createApp() {
   }
   
   function validateFacebookUserToken(userId, userToken, onResponse) {
-    request('https://graph.facebook.com/debug_token?input_token=' + userToken + '&access_token=' + userToken, function (error, response, body) {
+    request('https://graph.facebook.com/debug_token?input_token=' + userToken + '&access_token=' + appToken, function (error, response, body) {
       if (error) {
         console.log("Error authenticating with graph.facebook");
         console.log(error);

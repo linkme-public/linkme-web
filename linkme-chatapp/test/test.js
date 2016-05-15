@@ -83,4 +83,39 @@ describe("api tests", function () {
             .get("/layer/app")
             .expect('"' + process.env.LAYER_APPID + '"', done);
     });
+    
+    var accessToken = "EAAYLT0JVJZAQBAA7ylWNeu32uW2sNGYoctLHGlyfZCDCOZAPKMoe0TkRpwiGuXZBpsWLXtlkiM8BZAnuuGLCI92dLthiXdZAUWACZB8ZB8XHSaR2UCQX0sIDtYM2aijmZB4qIC9v0sAEkp6hO6IEdmPonmwK5OnvHGPR7PLsJl5xIDGeupBZCZCtzOZC";
+    
+    it("authenticate should return identity_token given a user_id and nonce", function(done) {
+          request(server)
+            .post("/authenticate")
+            .send({user_id:"104665883270909"})
+            .send({user_token: accessToken})
+            .send({nonce: "arbitraryString"})    
+            .expect(200, done);
+    });
+
+    it("authenticate should error 400 if user_id is missing", function(done) {
+          request(server)
+            .post("/authenticate")
+            .send({user_token: accessToken})
+            .send({nonce: "arbitraryString"})
+            .expect(400,'Missing `user_id` body parameter.', done);
+    });
+    
+    it("authenticate should error 400 if nonce is missing", function(done) {
+          request(server)
+            .post("/authenticate")
+            .send({user_id:"104665883270909"})
+            .send({user_token: accessToken})
+            .expect(400,'Missing `nonce` body parameter.', done);
+    });
+    
+    it("authenticate should error 400 if user_token is missing", function(done) {
+          request(server)
+            .post("/authenticate")
+            .send({user_id:"104665883270909"})
+            .send({nonce: "arbitraryString"})
+            .expect(400,'Missing `user_token` body parameter.', done);
+    });
 });
