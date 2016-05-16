@@ -1,6 +1,7 @@
 var should = require("should");
 var request = require("supertest");
 var async = require("async");
+var nock = require('nock');
 
 var server = require("./../devServer");
 
@@ -84,22 +85,35 @@ describe("api tests", function () {
             .expect('"' + process.env.LAYER_APPID + '"', done);
     });
     
-    var accessToken = process.env.FACEBOOK_TESTUSER_APPTOKEN;
-    
-    // TODO: Find out why is it failing
-    // it("authenticate should return identity_token given a user_id and nonce", function(done) {
-    //       request(server)
-    //         .post("/authenticate")
-    //         .send({user_id:"104665883270909"})
-    //         .send({user_token: accessToken})
-    //         .send({nonce: "arbitraryString"})    
-    //         .expect(200, done);
-    // });
+    var userToken = process.env.FACEBOOK_TESTUSER_APPTOKEN;
+    var facebookAppId = process.env.FACEBOOK_APPID;
+    var appToken = facebookAppId + "%7C" + process.env.FACEBOOK_APPSECRET;
+    var facebookTestUserId = "104665883270909";
+                
+    var couchdb = nock('https://graph.facebook.com')
+                .persist()
+                .get("/debug_token?input_token=" + userToken + "&access_token=" + appToken)
+                .reply(200, {
+                    statusCode: 200,
+                    data: {
+                        app_id: facebookAppId,
+                        user_id: facebookTestUserId
+                    }
+                 });
+                 
+    it("authenticate should return identity_token given a user_id and nonce", function(done) {
+          request(server)
+            .post("/authenticate")
+            .send({user_id:facebookTestUserId})
+            .send({user_token: userToken})
+            .send({nonce: "arbitraryString"})    
+            .expect(200, done);
+    });
 
     it("authenticate should error 400 if user_id is missing", function(done) {
           request(server)
             .post("/authenticate")
-            .send({user_token: accessToken})
+            .send({user_token: userToken})
             .send({nonce: "arbitraryString"})
             .expect(400,'Missing `user_id` body parameter.', done);
     });
@@ -107,15 +121,15 @@ describe("api tests", function () {
     it("authenticate should error 400 if nonce is missing", function(done) {
           request(server)
             .post("/authenticate")
-            .send({user_id:"104665883270909"})
-            .send({user_token: accessToken})
+            .send({user_id:facebookTestUserId})
+            .send({user_token: userToken})
             .expect(400,'Missing `nonce` body parameter.', done);
     });
     
     it("authenticate should error 400 if user_token is missing", function(done) {
           request(server)
             .post("/authenticate")
-            .send({user_id:"104665883270909"})
+            .send({user_id:facebookTestUserId})
             .send({nonce: "arbitraryString"})
             .expect(400,'Missing `user_token` body parameter.', done);
     });

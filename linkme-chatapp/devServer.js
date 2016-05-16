@@ -147,10 +147,14 @@ function createApp() {
   }
   
   function validateFacebookUserToken(userId, userToken, onResponse) {
-    request('https://graph.facebook.com/debug_token?input_token=' + userToken + '&access_token=' + appToken, function (error, response, body) {
+    var requestUri = 'https://graph.facebook.com/debug_token?input_token=' + userToken + '&access_token=' + appToken;
+    console.log("validateFacebookUserToken - Facebook Request uri: " + requestUri);
+    request(requestUri, function (error, response, body) {
+      console.log("validateFacebookUserToken: " + JSON.stringify(response));
       if (error) {
         console.log("Error authenticating with graph.facebook");
         console.log(error);
+        throw error;
       }
       console.log("Got back " + response.statusCode + " from graph.facebook");
       if (!error && response.statusCode == 200) {
