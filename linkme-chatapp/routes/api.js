@@ -1,10 +1,11 @@
 var router = require("express").Router();
 var validUrl = require('valid-url');
 var layer = require('layer-api');
+var requestApi = require('request');
 
 var layerAppId = process.env.LAYER_APPID;
 var layerAppTokenId = process.env.LAYER_APP_TOKEN;
-  
+
 var client = new layer({
     appId: layerAppId,
     token: layerAppTokenId
@@ -24,8 +25,10 @@ router.get('/', function (request, response) {
  */
 router.post('/link', function (request, response) {
     var link = request.body.link;
+    var accessToken = request.body.facebookAccessToken;
 
     console.log("link = " + link);
+    console.log("accessToken = " + accessToken);
 
     if (link === null || link === undefined) {
         response
@@ -47,9 +50,17 @@ router.post('/link', function (request, response) {
         return;
     }
 
+    // Get user info
+    var userInfoUrl = "https://graph.facebook.com/me?access_token=" + accessToken;
+    requestApi(userInfoUrl, function (error, response, body) {
+        console.log("Got back user info");
+        console.log(error);
+        console.log(body);
+    });
+
     // Create a Conversation 
     client.conversations.create({
-            participants: [
+        participants: [
             "1173665432652489", //vando
             "10153420634920946", //reza
             "1176465935705725" //olly
@@ -58,11 +69,11 @@ router.post('/link', function (request, response) {
         metadata: {
             "title": link
         }
-    }, function(err, res) {
+    }, function (err, res) {
         var cid = res.body.id;
-        
+
         // Send a Message 
-        client.messages.sendTextFromUser(cid, '1173665432652489', link, function(err, res) {
+        client.messages.sendTextFromUser(cid, '1173665432652489', link, function (err, res) {
             console.log(err || res.body);
         });
     });
