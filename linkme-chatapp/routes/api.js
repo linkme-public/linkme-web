@@ -1,7 +1,7 @@
 var router = require("express").Router();
 var validUrl = require('valid-url');
 var layer = require('layer-api');
-var request = require('request');
+var requestApi = require('request');
 
 var layerAppId = process.env.LAYER_APPID;
 var layerAppTokenId = process.env.LAYER_APP_TOKEN;
@@ -52,7 +52,7 @@ router.post('/link', function (request, response) {
 
     // Get user info
     var userInfoUrl = "https://graph.facebook.com/me?access_token=" + accessToken;
-    request(requestUri, function (error, response, body) {
+    requestApi(userInfoUrl, function (error, response, body) {
         console.log("Got back user info");
         console.log(error);
         console.log(body);
