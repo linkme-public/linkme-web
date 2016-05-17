@@ -51,11 +51,17 @@ router.post('/link', function (request, response) {
     }
 
     // Get user info
-    var userInfoUrl = "https://graph.facebook.com/me?access_token=" + accessToken;
+    var userName = "Default User";
+    var userInfoUrl = "https://graph.facebook.com/v2.5/me?access_token=" + accessToken + "&method=get&pretty=0&sdk=joey";
+    console.log("Getting user info from " + userInfoUrl);
     requestApi(userInfoUrl, function (error, response, body) {
         console.log("Got back user info");
         console.log(error);
         console.log(body);
+
+        if (body != undefined && body.name != undefined) {
+            userName = body.name;
+        }
     });
 
     // Create a Conversation 
@@ -73,7 +79,7 @@ router.post('/link', function (request, response) {
         var cid = res.body.id;
 
         // Send a Message 
-        client.messages.sendTextFromUser(cid, '1173665432652489', link, function (err, res) {
+        client.messages.sendTextFromUser(cid, userName, link, function (err, res) {
             console.log(err || res.body);
         });
     });
