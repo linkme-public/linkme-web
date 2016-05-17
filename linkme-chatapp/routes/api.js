@@ -11,6 +11,26 @@ var client = new layer({
     token: layerAppTokenId
 });
 
+function getUserInfo(accessToken, callback) {
+    // Get user info
+    var userName = "Default User";
+    var userInfoUrl = "https://graph.facebook.com/v2.5/me?access_token=" + accessToken + "&method=get&pretty=0&sdk=joey";
+    console.log("Getting user info from " + userInfoUrl);
+    requestApi(userInfoUrl, function (error, response, body) {
+        console.log("Got back user info");
+
+        if (response != undefined && response.body != undefined) {
+            var resJson = JSON.parse(response.body);
+
+            console.log(resJson);
+
+            userName = resJson.name;
+        }
+
+        callback(userName);
+    });
+}
+
 /**
  * Get a ping from the api
  */
@@ -50,50 +70,39 @@ router.post('/link', function (request, response) {
         return;
     }
 
-    // Get user info
-    var userName = "Default User";
-    var userInfoUrl = "https://graph.facebook.com/v2.5/me?access_token=" + accessToken + "&method=get&pretty=0&sdk=joey";
-    console.log("Getting user info from " + userInfoUrl);
-    requestApi(userInfoUrl, function (error, response, body) {
-        console.log("Got back user info");
-        console.log(error);
+    if (accessToken === undefined) {
+        // TODO enforce this check!
+        console.log("accessToken is undefined!");
+    }
 
-        if (response != undefined && response.body != undefined) {
-            var resJson = JSON.parse(response.body);
+    getUserInfo(accessToken, function (userName) {
 
-            if (resJson.name != undefined) {
-                userName = body.name;
+        // Create a Conversation 
+        client.conversations.create({
+            participants: [
+                "1173665432652489", //vando
+                "10153420634920946", //reza
+                "1176465935705725", //olly
+                userName
+            ],
+            distinct: false,
+            metadata: {
+                "title": link
             }
-        }
-    });
+        }, function (err, res) {
+            var cid = res.body.id;
 
-    // Create a Conversation 
-    client.conversations.create({
-        participants: [
-            "1173665432652489", //vando
-            "10153420634920946", //reza
-            "1176465935705725" //olly
-        ],
-        distinct: false,
-        metadata: {
-            "title": link
-        }
-    }, function (err, res) {
-        var cid = res.body.id;
-
-        // Send a Message 
-        client.messages.sendTextFromUser(cid, "1173665432652489", link, function (err, res) {
-            console.log(err || res.body);
+            // Send a Message 
+            console.log("Facebook user name = " + userName);
+            client.messages.sendTextFromUser(cid, userName, link, function (err, res) {
+                console.log(err || res.body);
+            });
         });
 
-        client.messages.sendTextFromUser(cid, "1173665432652489", userName, function (err, res) {
-            console.log(err || res.body);
-        });
+        response
+            .status(200)
+            .end();
     });
-
-    response
-        .status(200)
-        .end();
 });
 
 module.exports = router;

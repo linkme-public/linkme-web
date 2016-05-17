@@ -147,7 +147,7 @@ function createApp() {
   }
   
   function validateFacebookUserToken(userId, userToken, onResponse) {
-    var requestUri = 'https://graph.facebook.com/debug_token?input_token=' + userToken + '&access_token=' + appToken;
+    var requestUri = 'https://graph.facebook.com/debug_token?input_token=' + userToken + '&access_token=' + userToken;
     console.log("validateFacebookUserToken - Facebook Request uri: " + requestUri);
     request(requestUri, function (error, response, body) {
       console.log("validateFacebookUserToken: " + JSON.stringify(response));
