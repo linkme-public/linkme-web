@@ -57,10 +57,13 @@ router.post('/link', function (request, response) {
     requestApi(userInfoUrl, function (error, response, body) {
         console.log("Got back user info");
         console.log(error);
-        console.log(body);
 
-        if (body != undefined && body.name != undefined) {
-            userName = body.name;
+        if (response != undefined && response.body != undefined) {
+            var resJson = JSON.parse(response.body);
+
+            if (resJson.name != undefined) {
+                userName = body.name;
+            }
         }
     });
 
@@ -79,7 +82,11 @@ router.post('/link', function (request, response) {
         var cid = res.body.id;
 
         // Send a Message 
-        client.messages.sendTextFromUser(cid, userName, link, function (err, res) {
+        client.messages.sendTextFromUser(cid, "1173665432652489", link, function (err, res) {
+            console.log(err || res.body);
+        });
+
+        client.messages.sendTextFromUser(cid, "1173665432652489", userName, function (err, res) {
             console.log(err || res.body);
         });
     });
